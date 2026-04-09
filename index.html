@@ -1,450 +1,109 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SimLearn — Login</title>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --teal: #00E5C3; --teal-dim: rgba(0,229,195,0.12); --teal-glow: rgba(0,229,195,0.25);
-    --bg: #07090F; --surface: #0D1017; --surface2: #131820;
-    --border: rgba(255,255,255,0.07); --border-hover: rgba(0,229,195,0.4);
-    --text: #F0F4FF; --text-muted: #6B7A99; --text-secondary: #9AAAC5;
-    --error: #FF5B6A; --amber: #FFB84D; --purple: #9B7FFF; --green: #1DB96C;
-  }
-  body { font-family: 'Space Grotesk', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; overflow: hidden; }
-  canvas#particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-  .left-panel { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 60px 64px; position: relative; z-index: 1; }
-  .right-panel { width: 480px; flex-shrink: 0; background: var(--surface); border-left: 1px solid var(--border); display: flex; flex-direction: column; justify-content: center; padding: 60px 48px; position: relative; z-index: 1; overflow: hidden; }
-  .right-panel::before { content: ''; position: absolute; top: -120px; right: -80px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(0,229,195,0.06) 0%, transparent 70%); border-radius: 50%; pointer-events: none; }
-  .right-panel::after { content: ''; position: absolute; bottom: -100px; left: -60px; width: 240px; height: 240px; background: radial-gradient(circle, rgba(155,127,255,0.07) 0%, transparent 70%); border-radius: 50%; pointer-events: none; }
-  .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 72px; animation: fadeUp 0.6s ease both; }
-  .brand-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--teal-dim); border: 1px solid var(--teal); display: flex; align-items: center; justify-content: center; }
-  .brand-icon svg { width: 22px; height: 22px; }
-  .brand-name { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-  .brand-name span { color: var(--teal); }
-  .hero-tagline { font-family: 'Syne', sans-serif; font-size: clamp(36px, 4.5vw, 58px); font-weight: 800; line-height: 1.1; letter-spacing: -1.5px; margin-bottom: 24px; animation: fadeUp 0.6s 0.1s ease both; }
-  .hero-tagline .accent { color: var(--teal); }
-  .hero-tagline .accent2 { color: var(--purple); }
-  .hero-sub { font-size: 16px; color: var(--text-secondary); line-height: 1.7; max-width: 440px; margin-bottom: 52px; animation: fadeUp 0.6s 0.2s ease both; }
-  .subject-pills { display: flex; flex-wrap: wrap; gap: 10px; animation: fadeUp 0.6s 0.3s ease both; }
-  .pill { display: flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: 999px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); font-size: 13px; font-weight: 500; color: var(--text-secondary); transition: border-color 0.2s, color 0.2s; cursor: default; }
-  .pill:hover { border-color: var(--border-hover); color: var(--teal); }
-  .pill .dot { width: 7px; height: 7px; border-radius: 50%; }
-  .pill.chem .dot { background: var(--teal); }
-  .pill.phys .dot { background: var(--purple); }
-  .pill.math .dot { background: var(--amber); }
-  .pill.bio  .dot { background: #6EDB8F; }
-  .stats-row { display: flex; gap: 36px; margin-top: 56px; padding-top: 36px; border-top: 1px solid var(--border); animation: fadeUp 0.6s 0.4s ease both; }
-  .stat-item { display: flex; flex-direction: column; gap: 4px; }
-  .stat-num { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; letter-spacing: -1px; }
-  .stat-num span { color: var(--teal); }
-  .stat-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; }
-  .atom-decoration { position: absolute; bottom: 80px; right: 80px; opacity: 0.07; pointer-events: none; animation: spin 60s linear infinite; }
-  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-  /* RIGHT PANEL */
-  .login-header { margin-bottom: 32px; animation: fadeUp 0.6s 0.15s ease both; }
-  .login-header h2 { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
-  .login-header p { font-size: 14px; color: var(--text-muted); }
-  .form-group { margin-bottom: 16px; }
-  .form-group label { display: block; font-size: 12px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
-  .input-wrap { position: relative; }
-  .input-wrap svg.icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted); pointer-events: none; transition: color 0.2s; z-index: 1; }
-  .form-group input { width: 100%; padding: 13px 14px 13px 42px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'Space Grotesk', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
-  .form-group input::placeholder { color: var(--text-muted); }
-  .form-group input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-glow); }
-  .pw-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 2px; display: flex; align-items: center; transition: color 0.2s; }
-  .pw-toggle:hover { color: var(--teal); }
-  .form-footer { display: flex; justify-content: space-between; align-items: center; margin: 12px 0 20px; }
-  .checkbox-label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
-  .checkbox-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--teal); cursor: pointer; }
-  .forgot-link { font-size: 13px; color: var(--teal); text-decoration: none; transition: opacity 0.2s; }
-  .forgot-link:hover { opacity: 0.75; }
-  .btn-login { width: 100%; padding: 14px; background: var(--teal); color: #07090F; font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 0.3px; border: none; border-radius: 10px; cursor: pointer; transition: opacity 0.2s, transform 0.15s, background 0.3s; }
-  .btn-login:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
-  .btn-login:active { transform: translateY(0); }
-  .btn-login:disabled { opacity: 0.7; cursor: not-allowed; }
-  .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
-  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-  .divider span { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
-
-  /* Google button — replaces fake one */
-  .btn-google { width: 100%; padding: 12px; background: transparent; border: 1px solid var(--border); border-radius: 10px; color: var(--text-secondary); font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: border-color 0.2s, color 0.2s, background 0.2s; }
-  .btn-google:hover { border-color: rgba(255,255,255,0.2); color: var(--text); background: rgba(255,255,255,0.04); }
-  .btn-google:disabled { opacity: 0.6; cursor: not-allowed; }
-
-  /* Hide the real Google button rendered by GSI — we trigger it manually */
-  #g_id_onload { display: none; }
-  .g_id_signin { display: none !important; }
-
-  .signup-row { text-align: center; margin-top: 24px; font-size: 13px; color: var(--text-muted); }
-  .signup-row a { color: var(--teal); text-decoration: none; font-weight: 600; }
-  .signup-row a:hover { text-decoration: underline; }
-  .error-msg { display: none; font-size: 12px; color: var(--error); margin-top: -8px; margin-bottom: 12px; padding: 8px 12px; background: rgba(255,91,106,0.08); border-radius: 6px; border-left: 2px solid var(--error); }
-  .error-msg.show { display: block; }
-  .success-msg { display: none; font-size: 13px; color: var(--green); margin-bottom: 12px; padding: 10px 14px; background: rgba(29,185,108,0.08); border-radius: 8px; border-left: 2px solid var(--green); }
-  .success-msg.show { display: flex; align-items: center; gap: 8px; }
-
-  /* Forgot password modal */
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-  .modal-overlay.show { display: flex; }
-  .modal { background: #0D1017; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 36px; width: 400px; max-width: 90vw; animation: fadeUp 0.3s ease; }
-  .modal h3 { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 8px; }
-  .modal p { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
-  .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
-  .btn-cancel { flex: 1; padding: 11px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-family: 'Space Grotesk', sans-serif; font-size: 14px; cursor: pointer; transition: border-color 0.2s; }
-  .btn-cancel:hover { border-color: rgba(255,255,255,0.2); }
-  .btn-send { flex: 1; padding: 11px; background: var(--teal); border: none; border-radius: 8px; color: #07090F; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
-  .btn-send:hover { opacity: 0.85; }
-
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-  @media (max-width: 900px) { .left-panel { display: none; } .right-panel { width: 100%; padding: 48px 32px; } }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ChemLab Mix — Educational Chemistry Lab</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <header>
+    <h1>ChemLab Mix</h1>
+    <p class="subtitle">Mix two chemicals to observe realistic reactions, equations, and explanations.</p>
+  </header>
 
-<!-- ===================== GOOGLE OAUTH (hidden trigger) =====================
-  The Google Identity Services library renders an invisible button.
-  We call google.accounts.id.prompt() when user clicks our custom button.
-  Callback: handleGoogleCredential(response) decodes the JWT and stores user.
-======================================================================== -->
-<div id="g_id_onload"
-  data-client_id="YOUR_GOOGLE_CLIENT_ID"
-  data-callback="handleGoogleCredential"
-  data-auto_select="false"
-  data-cancel_on_tap_outside="true">
-</div>
-
-<canvas id="particles"></canvas>
-
-<!-- LEFT PANEL -->
-<div class="left-panel">
-  <div class="brand">
-    <div class="brand-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#00E5C3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="3"/>
-        <path d="M12 1C12 1 7 5 7 12s5 11 5 11"/>
-        <path d="M12 1C12 1 17 5 17 12s-5 11-5 11"/>
-        <path d="M1 12h22"/>
-      </svg>
-    </div>
-    <span class="brand-name">Sim<span>Learn</span></span>
-  </div>
-  <h1 class="hero-tagline">Science that you<br>can <span class="accent">see</span> &<br><span class="accent2">interact</span> with.</h1>
-  <p class="hero-sub">Visual simulations for Class 11 &amp; 12 — Chemistry reactions, Physics experiments, and Maths graphs. Built for Indian students, designed to make concepts click.</p>
-  <div class="subject-pills">
-    <div class="pill chem"><span class="dot"></span> Chemistry</div>
-    <div class="pill phys"><span class="dot"></span> Physics</div>
-    <div class="pill math"><span class="dot"></span> Mathematics</div>
-    <div class="pill bio"><span class="dot"></span> Biology</div>
-  </div>
-  <div class="stats-row">
-    <div class="stat-item"><div class="stat-num">80<span>+</span></div><div class="stat-label">Simulations</div></div>
-    <div class="stat-item"><div class="stat-num">4<span> Subjects</span></div><div class="stat-label">Covered</div></div>
-    <div class="stat-item"><div class="stat-num">Free<span> ✦</span></div><div class="stat-label">Always</div></div>
-  </div>
-  <svg class="atom-decoration" width="360" height="360" viewBox="0 0 360 360" fill="none">
-    <ellipse cx="180" cy="180" rx="170" ry="60" stroke="white" stroke-width="2"/>
-    <ellipse cx="180" cy="180" rx="170" ry="60" stroke="white" stroke-width="2" transform="rotate(60 180 180)"/>
-    <ellipse cx="180" cy="180" rx="170" ry="60" stroke="white" stroke-width="2" transform="rotate(120 180 180)"/>
-    <circle cx="180" cy="180" r="18" fill="white"/>
-    <circle cx="350" cy="180" r="10" fill="white"/>
-    <circle cx="265" cy="33" r="10" fill="white"/>
-    <circle cx="95" cy="33" r="10" fill="white"/>
-  </svg>
-</div>
-
-<!-- RIGHT PANEL -->
-<div class="right-panel">
-  <div class="login-header">
-    <h2>Welcome back 👋</h2>
-    <p>Log in to continue your learning journey</p>
+  <!-- 🔘 LAB TABS -->
+  <div class="lab-tabs">
+    <button id="inorganicTab" class="active">Inorganic Lab</button>
+    <button id="organicTab">Organic Lab</button>
+    <button id="quizTab">Quiz</button>
   </div>
 
-  <div id="successMsg" class="success-msg">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-    <span id="successText">Logged in! Redirecting…</span>
-  </div>
+  <main class="container">
+    <!-- 🧪 INORGANIC LAB -->
+    <section id="inorganicLab" class="lab-section active">
+      <div class="left-pane">
+        <div class="chem-list" id="chemList"></div>
 
-  <form id="loginForm" onsubmit="handleEmailLogin(event)">
-    <div class="form-group">
-      <label for="email">Email address</label>
-      <div class="input-wrap">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-        <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+        <div class="controls">
+          <button id="mixBtn" disabled>Mix</button>
+          <button id="resetBtn">Reset</button>
+        </div>
+
+        <div class="log">
+          <h3>Reaction Log</h3>
+          <ul id="logList"></ul>
+        </div>
       </div>
-    </div>
-    <div class="form-group">
-      <label for="password">Password</label>
-      <div class="input-wrap">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password">
-        <button type="button" class="pw-toggle" onclick="togglePw()" aria-label="Toggle password">
-          <svg id="eyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>
-          </svg>
-        </button>
+
+      <div class="right-pane">
+        <div class="bench">
+          <div class="beaker-wrapper">
+            <div id="beaker" class="beaker">
+              <div class="liquid" id="liquid"></div>
+              <div id="precipitate" class="precipitate"></div>
+              <div id="contents" class="contents"></div>
+            </div>
+            <div class="beaker-label">Beaker</div>
+          </div>
+
+          <div class="info">
+            <strong>Beaker:</strong>
+            <div id="beakerContentsText">No chemicals yet.</div>
+          </div>
+        </div>
       </div>
-    </div>
-    <div id="errorMsg" class="error-msg">Please fill in all fields correctly.</div>
-    <div class="form-footer">
-      <label class="checkbox-label"><input type="checkbox" id="remember"> Remember me</label>
-      <a href="#" class="forgot-link" onclick="openForgotModal(event)">Forgot password?</a>
-    </div>
-    <button type="submit" class="btn-login" id="loginBtn">Log In to SimLearn</button>
-  </form>
+    </section>
 
-  <div class="divider"><span>or continue with</span></div>
+    <!-- 🌿 ORGANIC LAB -->
+    <section id="organicLab" class="lab-section">
+      <div class="organic-instruments">
+        <h3>Organic Lab Setup</h3>
 
-  <button class="btn-google" id="googleBtn" type="button" onclick="triggerGoogleLogin()">
-    <svg width="18" height="18" viewBox="0 0 24 24">
-      <path fill="#EA4335" d="M5.27 9.76A7.08 7.08 0 0 1 12 4.9c1.84 0 3.5.66 4.8 1.76L20.1 3.4A11.96 11.96 0 0 0 12 0C7.32 0 3.26 2.7 1.28 6.67l3.99 3.09z"/>
-      <path fill="#34A853" d="M16.04 18.01A7.08 7.08 0 0 1 12 19.1c-3.07 0-5.7-1.94-6.72-4.67L1.26 17.4C3.24 21.3 7.32 24 12 24a11.97 11.97 0 0 0 8.09-3.14l-4.05-2.85z"/>
-      <path fill="#FBBC05" d="M19.89 16.86l.11-.07-4.05-2.85a6.96 6.96 0 0 1-.2.45A7.08 7.08 0 0 1 12 19.1v4.9c4.68 0 8.76-2.7 10.74-6.67"/>
-      <path fill="#4285F4" d="M24 12c0-.83-.08-1.63-.22-2.4H12v4.54h6.74A5.77 5.77 0 0 1 16.4 17l4.1 2.88C22.9 17.83 24 15.1 24 12z"/>
-    </svg>
-    Continue with Google
-  </button>
+        <div class="organic-controls">
+          <label for="organicTest">Select Test:</label>
+          <select id="organicTest">
+            <option value="">-- Choose a Test --</option>
+            <option value="fehling">Fehling’s Test (Aldehydes)</option>
+            <option value="tollens">Tollen’s Test (Silver Mirror)</option>
+            <option value="bromine">Bromine Water Test (Unsaturation)</option>
+            <option value="ester">Esterification</option>
+            <option value="phenol">Ferric Chloride Test (Phenol)</option>
+          </select>
+        </div>
 
-  <div class="signup-row">New to SimLearn? <a href="signup.html">Create a free account</a></div>
-</div>
+        <div class="organic-beaker" id="organicBeaker">
+          <div id="organicLiquid"></div>
+        </div>
 
-<!-- FORGOT PASSWORD MODAL -->
-<div class="modal-overlay" id="forgotModal" onclick="closeForgotModal(event)">
-  <div class="modal">
-    <h3>Reset your password</h3>
-    <p>Enter the email address linked to your SimLearn account and we'll send you a reset link.</p>
-    <div class="form-group">
-      <label for="resetEmail">Email address</label>
-      <div class="input-wrap">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-        <input type="email" id="resetEmail" placeholder="you@example.com">
+        <div class="controls">
+          <button id="addReagentBtn">➕ Add Reagent</button>
+          <button id="heatBtn">🔥 Heat</button>
+          <button id="observeBtn">👁️ Observe</button>
+        </div>
+
+        <div id="organicOutput"></div>
       </div>
-    </div>
-    <div id="resetMsg" class="success-msg" style="margin-top:12px;margin-bottom:0;"></div>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeForgotModal()">Cancel</button>
-      <button class="btn-send" onclick="sendResetLink()">Send Reset Link</button>
-    </div>
-  </div>
-</div>
+    </section>
 
-<script>
-/* ================================================================
-   DATA STORAGE OVERVIEW (no backend in this demo):
-   ─────────────────────────────────────────────────────────────────
-   localStorage key: "simlearn_user"
-   Stored object: {
-     name:      string  — user's full name
-     email:     string  — user's email
-     picture:   string  — avatar URL (Google) or null
-     loginType: "google" | "email"
-     loggedInAt: ISO timestamp
-   }
+    <!-- 🧠 QUIZ SECTION -->
+    <section id="quizLab" class="lab-section">
+      <div id="quizSection">
+        <h2>🧠 Reaction Quiz</h2>
+        <button id="startQuizBtn">Start Quiz</button>
+        <div id="quizContainer" style="display:none; margin-top: 15px;">
+          <p id="quizQuestion" style="font-weight:bold;"></p>
+          <div id="quizOptions" style="display:flex; flex-direction:column; gap:8px; max-width:600px; margin:auto;"></div>
+          <p id="quizFeedback" style="margin-top:10px;"></p>
+        </div>
+      </div>
+    </section>
+  </main>
 
-   WHY localStorage?
-   • Persists across browser sessions (until user logs out or clears browser data)
-   • Stored entirely on the user's device — no server involved in this demo
-   • For production: replace with a real backend (Firebase Auth, Supabase, etc.)
-     which stores users in a secure database server-side
+  <footer>
+    <small>Built with ❤️ for learning — Reactions and colors sourced from Wikipedia.</small>
+  </footer>
 
-   GOOGLE OAUTH FLOW:
-   1. User clicks "Continue with Google"
-   2. google.accounts.id.prompt() opens Google's native account picker popup
-   3. User selects account → Google calls handleGoogleCredential(response)
-   4. response.credential is a signed JWT (JSON Web Token) from Google
-   5. We decode the JWT payload (base64) to extract name/email/picture
-   6. Store in localStorage → redirect to dashboard.html
-   ================================================================ */
-
-  // ─── Particles ───────────────────────────────────────────────
-  const canvas = document.getElementById('particles');
-  const ctx = canvas.getContext('2d');
-  let W, H, particles = [];
-  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-  function rnd(a, b) { return a + Math.random() * (b - a); }
-  const COLS = ['#00E5C3','#9B7FFF','#FFB84D','#6EDB8F','#5589FF'];
-  class Particle {
-    constructor() { this.reset(true); }
-    reset(init) { this.x=rnd(0,W); this.y=init?rnd(0,H):H+10; this.r=rnd(1,3.5); this.alpha=rnd(0.08,0.35); this.speed=rnd(0.15,0.55); this.dx=rnd(-0.3,0.3); this.color=COLS[Math.floor(Math.random()*COLS.length)]; }
-    update() { this.y-=this.speed; this.x+=this.dx; if(this.y<-10)this.reset(false); }
-    draw() { ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2); ctx.fillStyle=this.color; ctx.globalAlpha=this.alpha; ctx.fill(); ctx.globalAlpha=1; }
-  }
-  function initParticles() { particles=[]; for(let i=0;i<90;i++)particles.push(new Particle()); }
-  function drawConnections() {
-    for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++){
-      const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, d=Math.sqrt(dx*dx+dy*dy);
-      if(d<100){ ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.strokeStyle='#00E5C3'; ctx.globalAlpha=(1-d/100)*0.06; ctx.lineWidth=0.5; ctx.stroke(); ctx.globalAlpha=1; }
-    }
-  }
-  function loop() { ctx.clearRect(0,0,W,H); drawConnections(); particles.forEach(p=>{p.update();p.draw();}); requestAnimationFrame(loop); }
-  resize(); initParticles(); loop();
-  window.addEventListener('resize',()=>{resize();initParticles();});
-
-  // ─── Toggle password ─────────────────────────────────────────
-  function togglePw() {
-    const input = document.getElementById('password');
-    const icon  = document.getElementById('eyeIcon');
-    if (input.type === 'password') {
-      input.type = 'text';
-      icon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`;
-    } else {
-      input.type = 'password';
-      icon.innerHTML = `<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>`;
-    }
-  }
-
-  // ─── Google OAuth ────────────────────────────────────────────
-  function triggerGoogleLogin() {
-    // Check if GSI library loaded
-    if (typeof google === 'undefined' || !google.accounts) {
-      showError('Google Sign-In not available. Make sure you\'ve set your Client ID and are running on a registered domain.');
-      return;
-    }
-    const btn = document.getElementById('googleBtn');
-    btn.disabled = true;
-    btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Opening Google…`;
-
-    google.accounts.id.initialize({
-      client_id: 'YOUR_GOOGLE_CLIENT_ID',  // ← Replace this
-      callback: handleGoogleCredential,
-      auto_select: false,
-      cancel_on_tap_outside: true,
-    });
-
-    google.accounts.id.prompt((notification) => {
-      // If One Tap is suppressed/unavailable, fall back to popup flow
-      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-        // Render a hidden sign-in button and programmatically click it
-        const tempDiv = document.createElement('div');
-        tempDiv.style.display = 'none';
-        document.body.appendChild(tempDiv);
-        google.accounts.id.renderButton(tempDiv, { type: 'standard' });
-        tempDiv.querySelector('[role="button"]')?.click();
-      }
-      // Reset button if user cancels
-      if (notification.isDismissedMoment()) {
-        btn.disabled = false;
-        btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24"><path fill="#EA4335" d="M5.27 9.76A7.08 7.08 0 0 1 12 4.9c1.84 0 3.5.66 4.8 1.76L20.1 3.4A11.96 11.96 0 0 0 12 0C7.32 0 3.26 2.7 1.28 6.67l3.99 3.09z"/><path fill="#34A853" d="M16.04 18.01A7.08 7.08 0 0 1 12 19.1c-3.07 0-5.7-1.94-6.72-4.67L1.26 17.4C3.24 21.3 7.32 24 12 24a11.97 11.97 0 0 0 8.09-3.14l-4.05-2.85z"/><path fill="#FBBC05" d="M19.89 16.86l.11-.07-4.05-2.85a6.96 6.96 0 0 1-.2.45A7.08 7.08 0 0 1 12 19.1v4.9c4.68 0 8.76-2.7 10.74-6.67"/><path fill="#4285F4" d="M24 12c0-.83-.08-1.63-.22-2.4H12v4.54h6.74A5.77 5.77 0 0 1 16.4 17l4.1 2.88C22.9 17.83 24 15.1 24 12z"/></svg> Continue with Google`;
-      }
-    });
-  }
-
-  // Called by Google after user picks account
-  function handleGoogleCredential(response) {
-    try {
-      // Decode JWT payload (middle part, base64url encoded)
-      const payload = JSON.parse(atob(response.credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
-      const user = {
-        name:       payload.name,
-        email:      payload.email,
-        picture:    payload.picture,
-        loginType:  'google',
-        loggedInAt: new Date().toISOString()
-      };
-      saveUserAndRedirect(user);
-    } catch(err) {
-      showError('Google sign-in failed. Please try again.');
-      document.getElementById('googleBtn').disabled = false;
-    }
-  }
-
-  // ─── Email login ─────────────────────────────────────────────
-  function handleEmailLogin(e) {
-    e.preventDefault();
-    const email    = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    const remember = document.getElementById('remember').checked;
-    hideError();
-
-    if (!email || !password) { showError('Please fill in both email and password.'); return; }
-    if (!email.includes('@')) { showError('Please enter a valid email address.'); return; }
-    if (password.length < 6) { showError('Password must be at least 6 characters.'); return; }
-
-    const btn = document.getElementById('loginBtn');
-    btn.textContent = 'Logging in…';
-    btn.disabled = true;
-
-    // Simulate auth check (replace with real API call to your backend)
-    setTimeout(() => {
-      const user = {
-        name:       email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-        email:      email,
-        picture:    null,
-        loginType:  'email',
-        loggedInAt: new Date().toISOString()
-      };
-      saveUserAndRedirect(user, remember);
-    }, 1200);
-  }
-
-  // ─── Save & redirect ─────────────────────────────────────────
-  function saveUserAndRedirect(user, persist = true) {
-    // Store user in localStorage (device-side, no server)
-    localStorage.setItem('simlearn_user', JSON.stringify(user));
-    if (persist) localStorage.setItem('simlearn_remember', 'true');
-
-    const successEl = document.getElementById('successMsg');
-    document.getElementById('successText').textContent = `Welcome, ${user.name.split(' ')[0]}! Redirecting to dashboard…`;
-    successEl.classList.add('show');
-
-    // Redirect after short delay
-    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
-  }
-
-  function showError(msg) {
-    const el = document.getElementById('errorMsg');
-    el.textContent = msg;
-    el.classList.add('show');
-  }
-  function hideError() { document.getElementById('errorMsg').classList.remove('show'); }
-
-  // ─── Forgot password modal ────────────────────────────────────
-  function openForgotModal(e) {
-    e.preventDefault();
-    document.getElementById('forgotModal').classList.add('show');
-  }
-  function closeForgotModal(e) {
-    if (!e || e.target === document.getElementById('forgotModal')) {
-      document.getElementById('forgotModal').classList.remove('show');
-      document.getElementById('resetMsg').classList.remove('show');
-      document.getElementById('resetEmail').value = '';
-    }
-  }
-  function sendResetLink() {
-    const email = document.getElementById('resetEmail').value.trim();
-    const msg   = document.getElementById('resetMsg');
-    if (!email || !email.includes('@')) {
-      msg.style.color = 'var(--error)';
-      msg.style.background = 'rgba(255,91,106,0.08)';
-      msg.style.borderColor = 'var(--error)';
-      msg.innerHTML = '⚠ Enter a valid email address.';
-      msg.classList.add('show');
-      return;
-    }
-    // In production: call your backend reset API here
-    msg.style.color = 'var(--green)';
-    msg.style.background = 'rgba(29,185,108,0.08)';
-    msg.style.borderColor = 'var(--green)';
-    msg.innerHTML = `✓ Reset link sent to <strong>${email}</strong>`;
-    msg.classList.add('show');
-    setTimeout(() => closeForgotModal({}), 2500);
-  }
-
-  // ─── Auto-redirect if already logged in ──────────────────────
-  window.addEventListener('load', () => {
-    const stored = localStorage.getItem('simlearn_user');
-    if (stored) {
-      try {
-        const user = JSON.parse(stored);
-        if (user.email) window.location.href = 'dashboard.html';
-      } catch(e) { localStorage.removeItem('simlearn_user'); }
-    }
-  });
-</script>
+  <script src="script.js"></script>
 </body>
 </html>

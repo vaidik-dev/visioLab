@@ -260,7 +260,7 @@ main { position: relative; z-index: 1; padding: 48px 40px; max-width: 1100px; ma
 
   <div class="section-title">Subjects</div>
   <div class="subject-grid">
-    <a href="index.html" class="subject-card chem" style="animation-delay:0.1s">
+    <a href="login.html" class="subject-card chem" style="animation-delay:0.1s">
       <div class="subject-top">
         <div class="subject-icon chem">⚗️</div>
         <div class="card-progress">
@@ -330,15 +330,15 @@ main { position: relative; z-index: 1; padding: 48px 40px; max-width: 1100px; ma
 
   <div class="section-title">Quick Access</div>
   <div class="quick-grid">
-    <a href="index.html#inorganicLab" class="quick-card" style="animation-delay:0.28s">
+    <a href="login.html#inorganicLab" class="quick-card" style="animation-delay:0.28s">
       <div class="quick-icon" style="background:rgba(0,229,195,0.1)">🧪</div>
       <div><div class="quick-label">Chemical Reactions</div><div class="quick-sub">Mix compounds live</div></div>
     </a>
-    <a href="index.html" class="quick-card" style="animation-delay:0.31s">
+    <a href="login.html" class="quick-card" style="animation-delay:0.31s">
       <div class="quick-icon" style="background:rgba(85,137,255,0.1)">🔬</div>
       <div><div class="quick-label">Periodic Table</div><div class="quick-sub">Interactive elements</div></div>
     </a>
-    <a href="index.html" class="quick-card" style="animation-delay:0.34s">
+    <a href="login.html" class="quick-card" style="animation-delay:0.34s">
       <div class="quick-icon" style="background:rgba(110,219,143,0.1)">⚖️</div>
       <div><div class="quick-label">Titration Lab</div><div class="quick-sub">Acid-base reactions</div></div>
     </a>
@@ -361,7 +361,7 @@ main { position: relative; z-index: 1; padding: 48px 40px; max-width: 1100px; ma
 /* ── AUTH GUARD ── */
 let currentUser = null;
 try { currentUser = JSON.parse(localStorage.getItem('simlearn_user')); } catch(e) {}
-if (!currentUser) window.location.href = 'login.html';
+if (!currentUser) window.location.href = 'index.html';
 
 /* ── PROGRESS DATA ── */
 function getProgress() {
@@ -457,7 +457,7 @@ function logout() {
   localStorage.removeItem('simlearn_user');
   localStorage.removeItem('simlearn_remember');
   if (typeof google !== 'undefined' && google.accounts) google.accounts.id.disableAutoSelect();
-  window.location.href = 'login.html';
+  window.location.href = 'index.html';
 }
 
 /* ── PARTICLES ── */
