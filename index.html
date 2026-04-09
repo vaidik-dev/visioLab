@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ChemLab Mix — Educational Chemistry Lab</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>ChemLab Mix</h1>
+    <p class="subtitle">Mix two chemicals to observe realistic reactions, equations, and explanations.</p>
+  </header>
+
+  <!-- 🔘 LAB TABS -->
+  <div class="lab-tabs">
+    <button id="inorganicTab" class="active">Inorganic Lab</button>
+    <button id="organicTab">Organic Lab</button>
+    <button id="quizTab">Quiz</button>
+  </div>
+
+  <main class="container">
+    <!-- 🧪 INORGANIC LAB -->
+    <section id="inorganicLab" class="lab-section active">
+      <div class="left-pane">
+        <div class="chem-list" id="chemList"></div>
+
+        <div class="controls">
+          <button id="mixBtn" disabled>Mix</button>
+          <button id="resetBtn">Reset</button>
+        </div>
+
+        <div class="log">
+          <h3>Reaction Log</h3>
+          <ul id="logList"></ul>
+        </div>
+      </div>
+
+      <div class="right-pane">
+        <div class="bench">
+          <div class="beaker-wrapper">
+            <div id="beaker" class="beaker">
+              <div class="liquid" id="liquid"></div>
+              <div id="precipitate" class="precipitate"></div>
+              <div id="contents" class="contents"></div>
+            </div>
+            <div class="beaker-label">Beaker</div>
+          </div>
+
+          <div class="info">
+            <strong>Beaker:</strong>
+            <div id="beakerContentsText">No chemicals yet.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 🌿 ORGANIC LAB -->
+    <section id="organicLab" class="lab-section">
+      <div class="organic-instruments">
+        <h3>Organic Lab Setup</h3>
+
+        <div class="organic-controls">
+          <label for="organicTest">Select Test:</label>
+          <select id="organicTest">
+            <option value="">-- Choose a Test --</option>
+            <option value="fehling">Fehling’s Test (Aldehydes)</option>
+            <option value="tollens">Tollen’s Test (Silver Mirror)</option>
+            <option value="bromine">Bromine Water Test (Unsaturation)</option>
+            <option value="ester">Esterification</option>
+            <option value="phenol">Ferric Chloride Test (Phenol)</option>
+          </select>
+        </div>
+
+        <div class="organic-beaker" id="organicBeaker">
+          <div id="organicLiquid"></div>
+        </div>
+
+        <div class="controls">
+          <button id="addReagentBtn">➕ Add Reagent</button>
+          <button id="heatBtn">🔥 Heat</button>
+          <button id="observeBtn">👁️ Observe</button>
+        </div>
+
+        <div id="organicOutput"></div>
+      </div>
+    </section>
+
+    <!-- 🧠 QUIZ SECTION -->
+    <section id="quizLab" class="lab-section">
+      <div id="quizSection">
+        <h2>🧠 Reaction Quiz</h2>
+        <button id="startQuizBtn">Start Quiz</button>
+        <div id="quizContainer" style="display:none; margin-top: 15px;">
+          <p id="quizQuestion" style="font-weight:bold;"></p>
+          <div id="quizOptions" style="display:flex; flex-direction:column; gap:8px; max-width:600px; margin:auto;"></div>
+          <p id="quizFeedback" style="margin-top:10px;"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <small>Built with ❤️ for learning — Reactions and colors sourced from Wikipedia.</small>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
